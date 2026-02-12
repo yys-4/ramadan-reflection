@@ -1,73 +1,90 @@
-# Welcome to your Lovable project
+# Ramadan Reflection
 
-## Project info
+A high-performance, PWA-ready Ramadan Spiritual Habit Tracker designed to help users maintain consistency in their worship through a gamified experience.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## I. Project Overview & Vision
 
-There are several ways of editing your application.
+**Project Name**: Ramadan Reflection
 
-**Use Lovable**
+**Description**:
+A high-performance, PWA-ready Ramadan Spiritual Habit Tracker designed to help users maintain consistency in their worship through a gamified experience.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+**Design Aesthetic**:
+Modern Bento Grid layout with a soothing Teal and Purple color palette.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## II. Core Features
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- 🍱 **Bento Grid Dashboard**: A responsive central hub displaying real-time progress, lifetime points, and daily streaks.
+- 📋 **Categorized Daily Checklist**: Habits grouped logically into 'Morning', 'Evening', and 'All Day' sections.
+- 🎮 **Advanced Gamification**: An automated system for calculating streaks and awarding badges based on specific point milestones and habit counts.
+- 📊 **Spiritual Analytics**: Data visualization using Recharts (Radar Charts) to monitor balance across different categories of worship.
+- 📱 **PWA Support**: Installable on iOS/Android with offline data resilience and 'Add to Home Screen' capabilities.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## III. Technical Architecture
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Tech Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+| Component | Technology |
+| :--- | :--- |
+| **Frontend** | React.js, Vite, Tailwind CSS, Shadcn UI, Framer Motion |
+| **Backend & Database** | Supabase (PostgreSQL) |
+| **Visualization** | Recharts |
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Backend & Security
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- **Supabase (PostgreSQL)**: Relational database consisting of 5 core tables:
+    - `profiles`
+    - `habits`
+    - `habit_logs`
+    - `achievements`
+    - `user_achievements`
+- **Data Security**: Strict Row Level Security (RLS) policies ensuring user data isolation.
+- **Integrity**: Use of SECURITY DEFINER functions and triggers for automated profile creation upon signup.
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## IV. Installation & Deployment
 
-**Use GitHub Codespaces**
+### Prerequisites
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm or yarn
 
-## What technologies are used for this project?
+### Steps
 
-This project is built with:
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-username/ramadan-reflection.git
+    cd ramadan-reflection
+    ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-## How can I deploy this project?
+3.  **Set up Environment Variables**:
+    Create a `.env` file in the root directory and add your Supabase credentials:
+    ```env
+    VITE_SUPABASE_URL=your_supabase_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+4.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## V. Future Roadmap
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- [ ] Implementation of 'Shareable Progress Cards' for social engagement.
+- [ ] Integration of Mood Trends and Daily Spiritual Quotes.
