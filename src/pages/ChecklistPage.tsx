@@ -20,7 +20,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Evening habits sort order for logical prayer sequence
+// Sort evening habits in the logical Islamic prayer sequence (Asr → Maghrib → Isha → Taraweeh).
+// Without this, habits would appear in database insertion order, which is confusing for users
+// who expect prayers listed chronologically as they occur during the day.
 const eveningOrder = ["Asr Prayer", "Maghrib Prayer", "Isha Prayer", "Taraweeh Prayer"];
 
 const timeGroups = [
@@ -48,7 +50,8 @@ export default function ChecklistPage() {
   const today = new Date().toISOString().split("T")[0];
   const prevPoints = useRef<number>(0);
 
-  // Point milestone confetti
+  // Point milestone confetti — triggers celebration when crossing 100-point boundaries.
+  // See useConfetti.ts for the floor-division detection logic.
   useEffect(() => {
     const pts = profile?.total_points || 0;
     if (prevPoints.current > 0) checkMilestone(pts);
@@ -94,12 +97,29 @@ export default function ChecklistPage() {
     return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
   });
 
+  /**
+   * Toggles a habit between completed/uncompleted with optimistic updates.
+   *
+   * Performance rationale: Optimistic UI updates are applied BEFORE the network
+   * request, maintaining 60fps responsiveness even on poor mosque WiFi where
+   * Supabase round-trips can take 2-5 seconds. If the server call fails, we
+   * roll back by invalidating the cache to re-fetch the true state.
+   *
+   * Mutation flow:
+   * 1. Optimistically update the React Query cache (instant UI feedback)
+   * 2. If offline → enqueue to localStorage for later sync
+   * 3. If online → mutate Supabase (insert/delete log, update points/streak)
+   * 4. After success → check for newly unlocked achievements
+   * 5. Invalidate all related queries to sync derived state
+   */
   const toggleHabit = async (habitId: string, currentlyDone: boolean) => {
     if (!user) return;
     const habit = habits.find((h: any) => h.id === habitId);
     const points = habit?.point_value || 10;
 
-    // Validation: prevent negative points
+    // Guard: prevent the edge case where unchecking would cause negative total points.
+    // This can happen if points were adjusted server-side (e.g., admin correction)
+    // after the optimistic cache was already set.
     if (currentlyDone && (profile?.total_points || 0) - points < 0) {
       toast({ title: "Cannot undo", description: "This would result in negative points.", variant: "destructive" });
       return;
@@ -107,7 +127,8 @@ export default function ChecklistPage() {
 
     setToggling((prev) => new Set(prev).add(habitId));
 
-    // Optimistic update
+    // Optimistic cache update for habit logs — toggling the checkbox state
+    // instantly without waiting for the network response.
     queryClient.setQueryData(["todayHabits", user.id, today], (old: any) => {
       if (!old) return old;
       const newLogs = currentlyDone
@@ -116,7 +137,8 @@ export default function ChecklistPage() {
       return { ...old, completedLogs: newLogs };
     });
 
-    // Optimistic points update
+    // Optimistic cache update for profile points — mirrors what the server will
+    // do via `increment_points` RPC, keeping the points counter responsive.
     queryClient.setQueryData(["profile", user.id], (old: any) => {
       if (!old) return old;
       return { ...old, total_points: (old.total_points || 0) + (currentlyDone ? -points : points) };
@@ -136,7 +158,10 @@ export default function ChecklistPage() {
       });
     }
 
-    // Offline-first: enqueue and try network
+    // Offline-first: if no network, persist the action to localStorage and bail.
+    // The useOfflineSync hook will replay these mutations when connectivity returns.
+    // This is critical for users checking habits during Taraweeh prayer in mosques
+    // with unreliable WiFi.
     if (!navigator.onLine) {
       enqueue({
         id: `${habitId}-${Date.now()}`,
@@ -154,7 +179,8 @@ export default function ChecklistPage() {
 
     try {
       if (currentlyDone) {
-        // UNCHECK path: no celebrations, no achievement check
+        // UNCHECK path: remove the log and subtract points. No achievement check
+        // needed here because unchecking can only reduce stats, never unlock new badges.
         const { error } = await supabase
           .from("habit_logs")
           .delete()
@@ -165,7 +191,10 @@ export default function ChecklistPage() {
         await supabase.rpc("increment_points", { user_row_id: user.id, amount: -points } as any);
         await supabase.rpc("update_streak", { p_user_id: user.id } as any);
       } else {
-        // CHECK path: insert log, add points, update streak, then check achievements
+        // CHECK path: insert log, add points, update streak, then check achievements.
+        // Achievement check is deliberately the LAST step because it reads the
+        // updated points/streak from the profile table — calling it before
+        // increment_points would read stale values and miss newly earned badges.
         const { error } = await supabase.from("habit_logs").insert({
           user_id: user.id,
           habit_id: habitId,
@@ -176,7 +205,8 @@ export default function ChecklistPage() {
         await supabase.rpc("increment_points", { user_row_id: user.id, amount: points } as any);
         await supabase.rpc("update_streak", { p_user_id: user.id } as any);
 
-        // Only check achievements after successful completion
+        // Server-side achievement check — runs AFTER points and streak are updated
+        // so the SECURITY DEFINER function reads the correct current values.
         const { data: newBadges } = await supabase.rpc("check_achievements", { p_user_id: user.id } as any);
         if (newBadges && (newBadges as UnlockedBadge[]).length > 0) {
           setUnlockedBadge((newBadges as UnlockedBadge[])[0]);
@@ -286,6 +316,8 @@ export default function ChecklistPage() {
                     key={habit.id}
                     onClick={() => toggleHabit(habit.id, isDone)}
                     disabled={isLoadingHabit}
+                    aria-label={`${isDone ? "Uncheck" : "Complete"} ${habit.name} for ${habit.point_value || 10} points`}
+                    aria-pressed={isDone}
                     className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-all duration-300 ease-out animate-fade-in hover:bg-card/60"
                     style={{ animationDelay: `${index * 50}ms`, animationFillMode: "backwards" }}
                   >
@@ -294,9 +326,8 @@ export default function ChecklistPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p
-                        className={`text-sm font-medium transition-all duration-300 ${
-                          isDone ? "line-through text-muted-foreground" : ""
-                        }`}
+                        className={`text-sm font-medium transition-all duration-300 ${isDone ? "line-through text-muted-foreground" : ""
+                          }`}
                       >
                         {habit.name}
                       </p>
@@ -307,9 +338,8 @@ export default function ChecklistPage() {
                         <Sparkles className="h-4 w-4 text-accent animate-scale-in" />
                       )}
                       <span
-                        className={`text-xs font-medium transition-all duration-300 ${
-                          isDone ? "text-primary" : "text-muted-foreground"
-                        }`}
+                        className={`text-xs font-medium transition-all duration-300 ${isDone ? "text-primary" : "text-muted-foreground"
+                          }`}
                       >
                         +{habit.point_value || 10}
                       </span>

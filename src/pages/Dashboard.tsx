@@ -13,6 +13,9 @@ import { RamadanCountdown } from "@/components/dashboard/RamadanCountdown";
 import { MoodCheck } from "@/components/dashboard/MoodCheck";
 import { ShareProgressButton } from "@/components/ShareProgressCard";
 
+// Rotating motivational messages — one per day, deterministic based on day-of-month.
+// Using modulo ensures the same message shows all day (no random flicker on re-render)
+// but cycles across the month, giving a fresh feel without needing a database query.
 const motivationalMessages = [
   "Every good deed is rewarded tenfold in Ramadan 🌙",
   "The best among you are those who learn the Quran and teach it ✨",
@@ -35,6 +38,11 @@ function GreetingCard({ name }: { name: string }) {
   );
 }
 
+/**
+ * Circular progress ring using SVG stroke-dasharray technique.
+ * The ring radius is 45 (in a 100×100 viewBox), giving a circumference of ~283.
+ * We offset the dash to reveal only the completed portion, animated via CSS transition.
+ */
 function ProgressCard({ completed, total }: { completed: number; total: number }) {
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   const circumference = 2 * Math.PI * 45;
@@ -153,6 +161,11 @@ function AchievementsCard({ achievements }: { achievements: any[] }) {
   );
 }
 
+/**
+ * Skeleton loader that mirrors the exact Bento Grid layout of the real dashboard.
+ * Matching the skeleton shape to the actual content prevents layout shift (CLS)
+ * when data loads in, which is critical for perceived performance on mobile.
+ */
 function DashboardSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -167,6 +180,12 @@ function DashboardSkeleton() {
   );
 }
 
+/**
+ * Main dashboard — Bento Grid layout that adapts from 1 column (mobile)
+ * to 3 columns (desktop). The grid structure is intentionally not extracted
+ * into a separate layout component because the column span assignments are
+ * tightly coupled to each card's content width requirements.
+ */
 export default function Dashboard() {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: todayData, isLoading: habitsLoading } = useTodayHabits();
@@ -174,6 +193,7 @@ export default function Dashboard() {
   const { canInstall, install } = usePWAInstall();
   const { checkMilestone, fireConfetti } = useConfetti();
   const queryClient = useQueryClient();
+  // Track previous points to detect milestone crossings (not just absolute values)
   const prevPoints = useRef<number>(0);
 
   const handleRefresh = useCallback(async () => {
@@ -183,7 +203,9 @@ export default function Dashboard() {
 
   const { containerRef, isRefreshing, pullDistance, threshold } = usePullToRefresh(handleRefresh);
 
-  // Check for point milestones
+  // Fire confetti when the user crosses a 100-point milestone.
+  // The `prevPoints > 0` guard skips the initial load — we only celebrate
+  // transitions, not the first render (which would confetti on every page load).
   useEffect(() => {
     const pts = profile?.total_points || 0;
     if (prevPoints.current > 0) {

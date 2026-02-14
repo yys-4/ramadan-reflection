@@ -10,7 +10,16 @@ const navItems = [
   { to: "/insights", icon: BarChart3, label: "Insights" },
   { to: "/achievements", icon: Trophy, label: "Achievements" },
 ];
-
+/**
+ * Root layout providing:
+ * - Desktop: 80px fixed sidebar with icon-only navigation (saves screen real estate)
+ * - Mobile: Bottom tab bar (thumb-accessible, follows iOS/Android native conventions)
+ *
+ * Dark mode is persisted to localStorage and hydrated on mount. The `prefers-color-scheme`
+ * media query provides the default for first-time visitors, respecting their OS setting.
+ *
+ * The Arabic letter "م" (Meem) in the logo represents "Mutaba'ah" (follow-up/tracking).
+ */
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut } = useAuth();
   const [dark, setDark] = useState(() =>

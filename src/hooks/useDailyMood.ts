@@ -4,6 +4,15 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export type MoodType = "Happy" | "Tired" | "Blessed";
 
+/**
+ * Manages the daily mood check-in feature.
+ *
+ * Each user can log one mood per day (constrained by a UNIQUE index on
+ * `user_id, mood_date`). The upsert pattern means tapping a different mood
+ * button simply overwrites the existing entry rather than failing — this lets
+ * users change their mind without friction, which is important because mood
+ * can shift between Sahur and Iftar.
+ */
 export function useDailyMood() {
   const { user } = useAuth();
   const today = new Date().toISOString().split("T")[0];
@@ -27,7 +36,8 @@ export function useDailyMood() {
   const mutation = useMutation({
     mutationFn: async (mood: MoodType) => {
       if (!user) throw new Error("Not authenticated");
-      // Upsert: insert or update for today
+      // Upsert: INSERT if no row exists for today, UPDATE if one does.
+      // Avoids the need for a separate "check then insert" pattern.
       const { error } = await supabase
         .from("daily_moods")
         .upsert(

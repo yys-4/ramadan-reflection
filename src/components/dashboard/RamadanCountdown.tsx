@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Moon } from "lucide-react";
-
-// Ramadan 2026 approximate dates (1 Ramadan ≈ Feb 17, Eid al-Fitr ≈ Mar 19)
+// Ramadan 2026 approximate dates (1 Ramadan ≈ Feb 17, Eid al-Fitr ≈ Mar 19).
+// These are hardcoded because the Islamic (Hijri) calendar doesn't have reliable
+// JS date library support and the exact dates depend on moon sighting which
+// varies by region. In production, these should be configurable per locale.
 const RAMADAN_START = new Date("2026-02-17");
 const EID_DATE = new Date("2026-03-19");
 const TOTAL_DAYS = 30;
@@ -16,7 +18,8 @@ export function RamadanCountdown() {
   // Use daysPassed out of TOTAL_DAYS for accurate percentage (day 1 = 1/30 completed at end of day)
   const completedDays = Math.min(daysPassed, TOTAL_DAYS);
   const progress = Math.min(100, Math.max(0, (completedDays / TOTAL_DAYS) * 100));
-
+  // `daysPassed + 1` converts zero-indexed elapsed days into human-friendly
+  // "day of Ramadan" numbering — day 0 elapsed means it's Day 1 of Ramadan.
   const dayOfRamadan = Math.min(daysPassed + 1, 30);
 
   return (

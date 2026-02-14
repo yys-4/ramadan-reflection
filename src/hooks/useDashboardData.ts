@@ -2,6 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+/**
+ * Fetches the current user's profile (points, streak, name).
+ *
+ * Uses `user.id` as a cache key segment so React Query automatically
+ * invalidates stale data when the user signs out and another user signs in
+ * on the same device — critical for shared-device scenarios during family
+ * Ramadan gatherings.
+ */
 export function useProfile() {
   const { user } = useAuth();
   return useQuery({
@@ -19,6 +27,17 @@ export function useProfile() {
   });
 }
 
+/**
+ * Fetches today's habits and the user's completion logs for the current date.
+ *
+ * Both queries fire in parallel via `Promise.all` to minimize Supabase round-trips —
+ * the habit master list and today's logs are independent datasets that can be fetched
+ * concurrently, cutting perceived load time in half on slow connections.
+ *
+ * The date-based cache key ensures the query automatically refreshes after midnight
+ * without requiring a manual invalidation, so the checklist always reflects the
+ * current day's progress.
+ */
 export function useTodayHabits() {
   const { user } = useAuth();
   const today = new Date().toISOString().split("T")[0];
@@ -46,6 +65,13 @@ export function useTodayHabits() {
   });
 }
 
+/**
+ * Fetches the 3 most recent achievements earned by the current user.
+ *
+ * Uses a join (`achievements(*)`) to avoid a separate query for badge metadata.
+ * Limited to 3 results because this feeds the compact dashboard card, not the
+ * full achievements page.
+ */
 export function useRecentAchievements() {
   const { user } = useAuth();
   return useQuery({

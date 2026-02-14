@@ -30,7 +30,23 @@ export default function InsightsPage() {
     );
   }
 
-  if (!data) return null;
+  // Empty state for first-time users or weeks with no logged habits.
+  // Instead of showing a blank page (confusing), we guide the user
+  // toward the checklist — the primary action that generates insight data.
+  if (!data) {
+    return (
+      <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-4 p-8 pt-20 text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+          <BarChart3 className="h-8 w-8 text-primary" />
+        </div>
+        <h2 className="text-lg font-semibold text-foreground">No insights yet</h2>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Start completing habits on your checklist to see weekly trends, category breakdowns,
+          and performance analytics here.
+        </p>
+      </div>
+    );
+  }
 
   const { dailyData, categoryData, weeklyPoints, bestDay, totalLogs } = data;
   const maxCompleted = Math.max(...dailyData.map((d) => d.total), 1);
@@ -141,9 +157,8 @@ export default function InsightsPage() {
                   <span className="text-xs font-medium">{d.pct}%</span>
                   <div className="w-full rounded-t-md bg-muted" style={{ height: 100 }}>
                     <div
-                      className={`w-full rounded-t-md transition-all duration-500 ${
-                        isToday ? "bg-gradient-to-t from-primary to-accent" : "bg-primary/60"
-                      }`}
+                      className={`w-full rounded-t-md transition-all duration-500 ${isToday ? "bg-gradient-to-t from-primary to-accent" : "bg-primary/60"
+                        }`}
                       style={{ height: `${height}%`, marginTop: `${100 - height}%` }}
                     />
                   </div>
