@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    allowedHosts: true, // Allow DigitalOcean domains (e.g., *.ondigitalocean.app)
     hmr: {
       overlay: false,
     },
