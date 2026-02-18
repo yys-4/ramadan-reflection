@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
     if (error) throw error;
-    toast({ title: "Account created! ✨", description: "Please check your email to verify your account." });
+    toast({ title: "Account created! ✨", description: "Welcome aboard — your Ramadan journey begins now! 🌙" });
   };
 
   const signOut = async () => {
