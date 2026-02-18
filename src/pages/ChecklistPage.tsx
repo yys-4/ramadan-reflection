@@ -54,10 +54,10 @@ export default function ChecklistPage() {
   const prevPoints = useRef<number>(0);
 
   // Point milestone confetti — triggers celebration when crossing 100-point boundaries.
-  // See useConfetti.ts for the floor-division detection logic.
+  // Only fires when points INCREASE to avoid false celebrations on uncheck.
   useEffect(() => {
     const pts = profile?.total_points || 0;
-    if (prevPoints.current > 0) checkMilestone(pts);
+    if (prevPoints.current > 0 && pts > prevPoints.current) checkMilestone(pts);
     prevPoints.current = pts;
   }, [profile?.total_points, checkMilestone]);
 
