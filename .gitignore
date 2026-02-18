@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (contains Supabase secrets — NEVER commit)
+.env
+.env.local
+.env.production
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +27,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Bun lock file — excluded to avoid "multiple lock files" error on DigitalOcean.
+# npm's package-lock.json is the primary lock file for deployment; bun.lockb
+# is kept locally for developers who prefer Bun.
+bun.lockb
