@@ -20,6 +20,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
+// Sort morning habits in the logical Islamic prayer sequence (Fajr → Dhuhr).
+const morningOrder = ["Fajr Prayer", "Dhuhr Prayer"];
+
 // Sort evening habits in the logical Islamic prayer sequence (Asr → Maghrib → Isha → Taraweeh).
 // Without this, habits would appear in database insertion order, which is confusing for users
 // who expect prayers listed chronologically as they occur during the day.
@@ -82,13 +85,22 @@ export default function ChecklistPage() {
   }, 0);
   const maxPoints = habits.reduce((sum: number, h: any) => sum + (h.point_value || 10), 0);
 
-  // Group by time of day
+  // Group by time of day — habits whose category doesn't match a known group
+  // are placed in "All Day" to prevent silent dropping of data.
   const grouped: Record<string, any[]> = { Morning: [], Evening: [], "All Day": [] };
   habits.forEach((h: any) => {
     const category = h.category || "All Day";
     if (grouped[category]) {
       grouped[category].push(h);
+    } else {
+      grouped["All Day"].push(h);
     }
+  });
+  // Sort morning habits in logical prayer order (Fajr → Dhuhr)
+  grouped["Morning"].sort((a: any, b: any) => {
+    const ai = morningOrder.indexOf(a.name);
+    const bi = morningOrder.indexOf(b.name);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
   });
   // Sort evening habits in logical prayer order
   grouped["Evening"].sort((a: any, b: any) => {
