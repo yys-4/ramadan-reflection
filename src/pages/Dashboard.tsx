@@ -244,7 +244,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-3">
               <Download className="h-5 w-5 text-primary" />
               <div>
-                <p className="text-sm font-semibold">Install Ramadan Tracker</p>
+                <p className="text-sm font-semibold">Install Ramadan Reflection</p>
                 <p className="text-xs text-muted-foreground">Add to home screen for the best experience</p>
               </div>
             </div>

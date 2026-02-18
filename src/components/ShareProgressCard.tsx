@@ -36,7 +36,7 @@ export function ShareProgressButton(props: ShareProgressProps) {
     if (!imageUrl) return;
     const a = document.createElement("a");
     a.href = imageUrl;
-    a.download = `mutabaah-progress-${new Date().toISOString().split("T")[0]}.png`;
+    a.download = `ramadan-reflection-progress-${new Date().toISOString().split("T")[0]}.png`;
     a.click();
   };
 
@@ -83,7 +83,7 @@ export function ShareProgressButton(props: ShareProgressProps) {
               >
                 م
               </div>
-              <p style={{ marginTop: 8, fontSize: 11, opacity: 0.6 }}>Mutaba'ah Pro</p>
+              <p style={{ marginTop: 8, fontSize: 11, opacity: 0.6 }}>Ramadan Reflection</p>
               <p style={{ marginTop: 4, fontSize: 10, opacity: 0.4 }}>
                 {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
               </p>
@@ -148,7 +148,7 @@ export function ShareProgressButton(props: ShareProgressProps) {
 
               {/* Footer */}
               <p style={{ marginTop: "auto", paddingTop: 32, fontSize: 10, opacity: 0.3 }}>
-                Track your Ramadan journey • mutabaahpro.app
+                Track your Ramadan journey • ramadan-reflection.app
               </p>
             </div>
           </div>

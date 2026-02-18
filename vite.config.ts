@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "pwa-icon-512.png"],
       manifest: {
-        name: "Ramadan Tracker",
-        short_name: "Ramadan",
+        name: "Ramadan Reflection",
+        short_name: "Ramadan Reflection",
         description: "Track your Ramadan habits, streaks, and achievements",
         theme_color: "#2ab0a0",
         background_color: "#141c2e",

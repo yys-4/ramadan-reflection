@@ -47,7 +47,7 @@ export default function LoginPage() {
             <Moon className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold">Mutaba'ah Pro</CardTitle>
+            <CardTitle className="text-2xl font-bold">Ramadan Reflection</CardTitle>
             <CardDescription className="mt-1">
               {isSignUp ? "Create your account to start tracking" : "Welcome back, continue your journey"}
             </CardDescription>
