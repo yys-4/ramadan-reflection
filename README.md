@@ -81,10 +81,3 @@ Ensure you have the following installed:
     ```bash
     npm run dev
     ```
-
----
-
-## V. Future Roadmap
-
-- [ ] Implementation of 'Shareable Progress Cards' for social engagement.
-- [ ] Integration of Mood Trends and Daily Spiritual Quotes.
