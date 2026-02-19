@@ -56,8 +56,12 @@ export function useTodayHabits() {
       ]);
       if (habitsRes.error) throw habitsRes.error;
       if (logsRes.error) throw logsRes.error;
+      // Filter out "Sunnah Fasting" as requested (replaced by "Fasting" for Ramadan)
+      // We hide it in the UI but keep the data in DB for future use (Syawal etc).
+      const visibleHabits = habitsRes.data.filter((h: any) => h.name !== "Sunnah Fasting");
+
       return {
-        habits: habitsRes.data,
+        habits: visibleHabits,
         completedLogs: logsRes.data,
       };
     },

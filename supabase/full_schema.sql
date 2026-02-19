@@ -257,6 +257,7 @@ INSERT INTO public.habits (name, category, point_value, icon_name, is_default) V
   ('Tilawah Quran (1 Juz)', 'All Day', 50, 'BookOpen', true),
   ('Morning Adhkar', 'Morning', 10, 'Heart', true),
   ('Evening Adhkar', 'Evening', 10, 'Heart', true),
+  ('Fasting', 'All Day', 20, 'Utensils', true),
   ('Sunnah Fasting', 'All Day', 20, 'Utensils', true),
   ('Charity / Sadaqah', 'All Day', 20, 'HandHeart', true),
   ('Dua Before Iftar', 'Evening', 5, 'Star', true),
